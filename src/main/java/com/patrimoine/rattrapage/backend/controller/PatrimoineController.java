@@ -1,7 +1,9 @@
 package com.patrimoine.rattrapage.backend.controller;
 
 import com.patrimoine.rattrapage.backend.model.Patrimoine;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,7 +30,11 @@ public class PatrimoineController {
 
     @GetMapping("/{id}")
     public Patrimoine getPatrimoine(@PathVariable String id) {
-        return patrimoineStore.get(id);
+        Patrimoine patrimoine = patrimoineStore.get(id);
+        if (patrimoine == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); // Ajout de cette ligne
+        }
+        return patrimoine;
     }
 
     private void saveToFile() throws IOException {
@@ -41,7 +47,7 @@ public class PatrimoineController {
         Files.write(filePath, data.toString().getBytes());
     }
 
-    // Ajoutez cette méthode pour injecter le mock
+
     public void setPatrimoineStore(Map<String, Patrimoine> patrimoineStore) {
         PatrimoineController.patrimoineStore.clear();
         PatrimoineController.patrimoineStore.putAll(patrimoineStore);

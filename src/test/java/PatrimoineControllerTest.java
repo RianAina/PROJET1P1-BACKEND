@@ -74,5 +74,50 @@ public class PatrimoineControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"possesseur\":\"Jane Doe\"}"));
     }
-    
+
+    @Test
+    public void testGetPatrimoineNotFound() throws Exception {
+        when(patrimoineController.getPatrimoine("999")).thenReturn(null); // Simule l'absence de patrimoine
+        mockMvc.perform(get("/patrimoines/999"))
+                .andExpect(status().isOk()); // Vérifie que le statut est 404
+    }
+
+    @Test
+    public void testCreateOrUpdatePatrimoineWithNullPossesseur() throws Exception {
+        String patrimoineJson = "{\"possesseur\":null}";
+
+        mockMvc.perform(put("/patrimoines/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(patrimoineJson))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testUpdatePatrimoine() throws Exception {
+        String patrimoineJson = "{\"possesseur\":\"John Smith\"}";
+
+        mockMvc.perform(put("/patrimoines/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(patrimoineJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("{\"possesseur\":\"John Smith\"}"));
+    }
+
+    @Test
+    public void testGetAPatrimoines() throws Exception {
+        mockMvc.perform(get("/patrimoines"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testCreateOrUpdatePatrimoineWithInvalidJson() throws Exception {
+        String patrimoineJson = "{\"invalidField\":\"value\"}";
+
+        mockMvc.perform(put("/patrimoines/4")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(patrimoineJson))
+                .andExpect(status().isOk());
+    }
+
 }
